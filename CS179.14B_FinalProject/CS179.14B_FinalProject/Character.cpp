@@ -104,7 +104,6 @@ void Character::update(float dt) {
 	}
 	
 	sprt.move(vel*dt);
-	view.setCenter(sprt.getPosition());
 	
 	vel.y += GRAV;
 	can_jump = false;
@@ -145,24 +144,9 @@ sf::Vector2f Character::getVel() const {
 	return vel;
 }
 
-/* sf::Rect<float> Character::getXColBox() const {
-	sf::Rect<float> toRet(sprt.getGlobalBounds());
-	toRet.height -= 10;
-	toRet.top += 5;
-	return toRet;
-}
-
-sf::Rect<float> Character::getYColBox() const {
-	sf::Rect<float> toRet(sprt.getGlobalBounds());
-	toRet.width -= 10;
-	toRet.left += 5;
-	return toRet;
-} */
-
 void Character::render(sf::RenderTarget &g) {
 	Entity::render(g);
 	weap->render(g);
-	g.setView(view);
 	
 	sf::RectangleShape health_bar(sf::Vector2f(currhealth*CHARACTERS::HEALTHBAR_WIDTH/maxhealth, CHARACTERS::HEALTHBAR_HEIGHT));
 	health_bar.setPosition(sprt.getPosition());
@@ -175,11 +159,6 @@ void Character::render(sf::RenderTarget &g) {
 	health_bar.move(currhealth*CHARACTERS::HEALTHBAR_WIDTH/maxhealth, 0);
 	health_bar.setFillColor(sf::Color::Red);
 	g.draw(health_bar);
-}
-
-void Character::renderSprite(sf::RenderTarget &g) {
-	Entity::render(g);
-	weap->render(g);
 }
 
 void Character::update(sf::Vector2f pos, sf::Vector2f vel, Face face) {

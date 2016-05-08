@@ -1,9 +1,14 @@
 #pragma once
+
 #include <cstdlib>
 #include <cstdint>
 
-enum class MessageType : uint8_t {
-	Connect = 0, Disconnect = 1, Reconnect = 2, Status = 3, Ping = 4, Pong = 5, Attack = 6
+enum MessageType : uint8_t {
+	Connect = 0, Disconnect = 1, Reconnect = 2, Ping = 3, Pong = 4, Broadcast = 6
+};
+
+enum BroadcastType : uint8_t {
+	None = 0, Status = 1, Attack = 2, Hit = 3
 };
 
 enum Face : uint8_t {
@@ -17,13 +22,17 @@ enum playerChar : uint8_t {
 typedef uint32_t ID;
 
 #pragma pack(push, 1)
+
 struct Message {
-	MessageType type;
+	ID origin;
+	MessageType message_type;
+	BroadcastType broadcast_type;
 	uint16_t size;
 	uint8_t data[];
 };
 
-struct Status {
+struct StatusMessage {
+	uint32_t order;
 	float px, py;
 	float vx, vy;
 	Face face;
@@ -31,14 +40,7 @@ struct Status {
 	playerChar unit;
 };
 
-struct StatusMessage {
-	ID id;
-	uint32_t order;
-	Status stat;
-};
-
 struct AttackMessage {
-	ID id;
 	int attack;
 };
 

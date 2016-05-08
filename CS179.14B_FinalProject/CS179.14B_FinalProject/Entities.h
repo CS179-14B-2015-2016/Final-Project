@@ -1,6 +1,8 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+
 #include "TextureLoader.h"
+
+#include <SFML/Graphics.hpp>
 
 class Entity {
 protected:

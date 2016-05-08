@@ -266,15 +266,16 @@ int main() {
 	std::cout << "Connecting to Server...";
 	{
 		uint8_t buffer[sizeof(Message) + sizeof(ID)];
-		auto msg = reinterpret_cast<Message*>(buffer);
-		msg->type = MessageType::Connect;
-		msg->size = 0;
+		auto message = reinterpret_cast<Message*>(buffer);
+		message->origin = 0;
+		message->message_type = MessageType::Connect;
+		message->broadcast_type = BroadcastType::None;
+		message->size = 0;
 		if (socket.send(buffer, sizeof(Message), server_address, port) != sf::Socket::Done) {
 			cerr << "Cannot connect to server." << endl;
 			system("pause");
 			return -1;
 		}
-
 
 		size_t recv_size;
 		sf::IpAddress recv_addr;
@@ -286,9 +287,9 @@ int main() {
 			return -1;
 		}
 		assert(recv_size == sizeof(buffer));
-		assert(msg->type == MessageType::Connect);
-		assert(msg->size == sizeof(ID));
-		player_id = *reinterpret_cast<ID*>(msg->data);
+		assert(message->broadcast_type == BroadcastType::None);
+		assert(message->size == sizeof(ID));
+		player_id = *reinterpret_cast<ID*>(message->data);
 	}
 	std::cout << "Connected to Server!" << endl;
 	socket.setBlocking(false);

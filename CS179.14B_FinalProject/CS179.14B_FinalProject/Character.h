@@ -1,10 +1,13 @@
 #pragma once
+
 #include "Entities.h"
 #include "Weapon.h"
 #include "GameMessage.h"
 #include "Game.h"
-#define WIN32_LEAN_AND_MEAN
+
 #include <Windows.h>
+
+#define WIN32_LEAN_AND_MEAN
 
 const float GRAV = 10.0f; // 9.8f / FPS;
 
@@ -39,8 +42,6 @@ private:
 	sf::Vector2f vel;
 	sf::Vector2f acc;
 	
-	sf::View view;
-	
 	Weapon* weap;
 	
 	bool can_jump;
@@ -53,8 +54,6 @@ public:
 		mdef(mdef), currhealth(maxhealth), maxhealth(maxhealth), id(id), can_jump(true), poison_timer(CHARACTERS::POISON_MAX_TIME), isColTile(false),velXMultiplier(1), weap(weap_in),type(type) {
 		sprt.setPosition(startPos);
 		sprt.setOrigin(sf::Vector2f(CHARACTERS::SPRITE_WIDTH / 2.0f, CHARACTERS::SPRITE_HEIGHT / 2.0f));
-		view.setSize(sf::Vector2f(512, 512));
-		view.setCenter(sprt.getPosition());
 		currface = Face::NONE;
 		seq;
 	}
@@ -79,7 +78,6 @@ public:
 	void update(float dt) override;
 	void update(sf::Vector2f pos, sf::Vector2f vel,Face face);
 	void render(sf::RenderTarget &g) override;
-	void renderSprite(sf::RenderTarget &g);
 	
 	ID getId() const;
 	playerChar getType() const;
@@ -181,14 +179,3 @@ public:
 	void Attack() override;
 	void SAttack() override;
 };
-
-
-
-
-
-
-
-
-
-
-

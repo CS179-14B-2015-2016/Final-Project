@@ -1,13 +1,20 @@
 #pragma once
+
 #include "Character.h"
 #include "Weapon.h"
 #include "Tile.h"
 #include "TextureLoader.h"
 #include "SObject.h"
+#include "Game.h"
+
 #include "SFML/Network.hpp"
+
 #include <vector>
 
 class EntityManager {
+private:
+	sf::View view;
+	
 public:
 	std::vector<Tile*> map;
 	Character* main_player;
@@ -17,9 +24,10 @@ public:
 	sf::UdpSocket* socket;
 	sf::IpAddress address;
 	unsigned int port;
-	//    socket.send(buffer, sizeof(buffer), server_address, port);
+	// socket.send(buffer, sizeof(buffer), server_address, port);
 	EntityManager(sf::UdpSocket* sock,const char* ip,const unsigned int &port) : socket(sock), address(ip), port(port) {
-		//bg.setTexture(*tl.getTexture("Art/Maps/bg_temp.png"));
+		view.setSize(sf::Vector2f(GAME::WINDOW_WIDTH, GAME::WINDOW_HEIGHT));
+		// bg.setTexture(*tl.getTexture("Art/Maps/bg_temp.png"));
 	}
 	virtual ~EntityManager() {}
 	void addPlayer(Character* p);

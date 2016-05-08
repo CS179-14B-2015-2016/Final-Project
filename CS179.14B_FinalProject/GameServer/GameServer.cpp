@@ -8,7 +8,9 @@
 #include <algorithm>
 #include <unordered_map>
 #include <atomic>
+
 #include <boost/asio.hpp>
+
 #include "GameMessage.h"
 
 using namespace std;
@@ -18,8 +20,6 @@ const auto time_beforeDC = 6.0f;
 
 atomic<ID> id_counter(0);
 
-
-
 struct Client{
 	ID client_id;
 	boost::asio::ip::udp::endpoint endpoint;
@@ -27,15 +27,16 @@ struct Client{
 	chrono::time_point<Clock> last_packet;
 	std::vector<uint8_t> send_buf;
 
-	void send(MessageType type, const void *data, size_t length) {
+	void send(MessageType message_type, BroadcastType broadcast_type, const void *data, size_t length) {
 		send_buf.resize(sizeof(Message) + length);
 		auto p = reinterpret_cast<Message*>(send_buf.data());
-		p->type = type;
+		p->message_type = message_type;
+		p->broadcast_type = broadcast_type;
 		p->size = length;
 		memcpy(p->data, data, length);
-		cout << "Sending data of total size: " << send_buf.size() << endl;
+		// cout << "Sending data of total size: " << send_buf.size() << endl;
 		socket.async_send_to(boost::asio::buffer(send_buf), endpoint, [this](auto error, auto size) {
-			cout << "Send success\n";
+			// cout << "Send success\n";
 		});
 	}
 };
@@ -56,69 +57,42 @@ int main(int argc, char **argv) {
 		boost::asio::ip::udp::endpoint source; /*server's endpoint*/
 
 		std::function<void(boost::system::error_code, size_t)> handler = [&](boost::system::error_code err, size_t length) {
-			auto msg = reinterpret_cast<const Message*>(recv_buffer.data());
-			cout << "INCOMMING" << endl;
-			switch (msg->type) {
-			case MessageType::Connect:{
-				ID id = id_counter++;
-				auto result = clients.emplace(id, Client{ id,source,socket,Clock::now()});
-				result.first->second.send(MessageType::Connect, &id, sizeof(id));
-				break;
-			}
-			case MessageType::Disconnect:
-				if (msg->size == sizeof(ID)) {
-					auto id = *reinterpret_cast<const ID*>(msg->data);
-					auto it = clients.find(id);
-					clients.erase(it);
+			auto message = reinterpret_cast<const Message*>(recv_buffer.data());
+			// cout << "INCOMING" << endl;
+			switch (message->message_type) {
+				case MessageType::Connect: {
+					ID id = id_counter++;
+					auto result = clients.emplace(id, Client{ id, source, socket,Clock::now() });
+					result.first->second.send(message->message_type, BroadcastType::None, &id, sizeof(id));
+					break;
 				}
-				break;
-			case MessageType::Status: {
-				if (msg->size < sizeof(StatusMessage)) {
-					cerr << "error" << endl;
+				case MessageType::Disconnect: {
+					if (message->size == sizeof(ID)) {
+						auto id = *reinterpret_cast<const ID*>(message->data);
+						auto it = clients.find(id);
+						clients.erase(it);
+					}
+					break;
 				}
-				else {
-
-					auto pm = reinterpret_cast<const StatusMessage*> (msg->data);
-					cout << "Recevied Status Message from: " << pm->id << endl;
+				case MessageType::Broadcast: {
+					// cout << "Recevied Status Message from: " << pm->id << endl;
 					for (auto &client : clients) {
-						if (client.first != pm->id) {
-							client.second.send(MessageType::Status, msg->data, msg->size);
-						}
-						else {
+						if (client.first != message->origin) {
+							client.second.send(message->message_type, message->broadcast_type, message->data, message->size);
+						} else {
 							client.second.last_packet = Clock::now();
 							client.second.endpoint = source;
 						}
 					}
+					break;
 				}
-				}
-				break;
-			case MessageType::Attack: {
-				if (msg->size < sizeof(AttackMessage)) {
-					cerr << "error" << endl;
-				}
-				else {
-
-					auto pm = reinterpret_cast<const AttackMessage*> (msg->data);
-					cout << "Recevied Attack Message from: " << pm->id << endl;
-					for (auto &client : clients) {
-						if (client.first != pm->id) {
-							client.second.send(MessageType::Attack, msg->data, msg->size);
-						}
-						else {
-							client.second.last_packet = Clock::now();
-							client.second.endpoint = source;
-						}
-					}
-				}
-			}
 			}
 			socket.async_receive_from(boost::asio::buffer(recv_buffer.data(), recv_buffer.size()), source, handler);
 		};
 
 		socket.async_receive_from(boost::asio::buffer(recv_buffer.data(), recv_buffer.size()), source, handler);
 		service.run();
-	}
-	catch (exception e) {
+	} catch (exception e) {
 		cerr << e.what() << endl;
 	}
 
