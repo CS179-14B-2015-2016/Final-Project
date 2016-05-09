@@ -12,10 +12,10 @@ void LavaTile::update(float dt) {
 }
 void LavaTile::collide(Entity* collided){
 	if (auto e = dynamic_cast<Character*>(collided)) {
-		cout << "Do Damage\n";
+		// cout << "Do Damage\n";
 		if (timer >= damageTimer){
 			timer = 0;
-			e->takeDamage(1);
+			e->takeDamage(3);
 		}
 	}
 }
@@ -33,7 +33,7 @@ void TrampolineTile::update(float dt) {}
 
 void TrampolineTile::collide(Entity* collided){
 	if (auto e = dynamic_cast<Character*>(collided)) {
-		cout << "Jump Higher\n";
+		// cout << "Jump Higher\n";
 		e->boosted();
 	}
 }
@@ -42,7 +42,7 @@ void TarTile::update(float dt) {}
 
 void TarTile::collide(Entity* collided){
 	if (auto e = dynamic_cast<Character*>(collided)) {
-		cout << "slow " << endl;
+		// cout << "slow " << endl;
 		e->slow();
 	}
 }

@@ -8,17 +8,21 @@ bool Character::isKeyDown(const int &key) {
 	return state >> 15 != 0;
 }
 
+bool Character::is_dead() {
+	return currhealth == 0;
+}
+
 int Character::handleMouse(int key,sf::RenderWindow &win) {
 	if (key == 1) {
 		//Attack();
 		if (sf::Mouse::getPosition(win).x > 0 && sf::Mouse::getPosition(win).x <= GAME::WINDOW_WIDTH/2) {
 			cout << "Left Normal" << endl;
-			weap->attack(weap->get_left_attack());
+			weapon->attack(weapon->get_left_attack());
 			return 1;
 		}
 		else if (sf::Mouse::getPosition(win).x >  GAME::WINDOW_WIDTH/2 && sf::Mouse::getPosition(win).x <= GAME::WINDOW_WIDTH) {
 			cout << "Right Normal" << endl;
-			weap->attack(weap->get_right_attack());
+			weapon->attack(weapon->get_right_attack());
 			return 2;
 		}
 		key = 0;
@@ -104,8 +108,17 @@ void Character::update(float dt) {
 	
 	can_jump = false;
 	
-	weap->setPosition(sprt.getPosition());
-	weap->update(dt);
+	weapon->setPosition(sprt.getPosition());
+	weapon->update(dt);
+}
+
+void Character::update(sf::Vector2f pos, int hp) {
+	sprt.setPosition(pos);
+	currhealth = hp;
+	if (currhealth == 0) {
+		revive();
+	}
+	// currface = face;
 }
 
 void Character::resetGravity() {
@@ -133,40 +146,42 @@ void Character::poison() {
 
 void Character::takeDamage(int damage){
 	currhealth = std::max(0, currhealth - damage);
-	if (currhealth == 0) {
-		currhealth = maxhealth;
-		++death_count;
-	}
 }
-void Character::heal(int heal){
+void Character::heal(int heal) {
 	currhealth = std::min(maxhealth, currhealth + heal);
 }
 
-sf::Vector2f Character::getVel() const {
-	return vel;
+void Character::revive() {
+	++num_deaths;
+	currhealth = maxhealth;
 }
 
-void Character::render(sf::RenderTarget &g) {
+void Character::render(sf::RenderTarget& g) {
 	Entity::render(g);
-	weap->render(g);
+	weapon->render(g);
 	
-	sf::RectangleShape health_bar(sf::Vector2f(currhealth*CHARACTERS::HEALTHBAR_WIDTH/maxhealth, CHARACTERS::HEALTHBAR_HEIGHT));
+	death_counter.setPosition(sprt.getPosition());
+	death_counter.move(-death_counter.getGlobalBounds().width/2, -(death_counter.getGlobalBounds().height + bounds().height)/2 - 20);
+	death_counter.setString(std::to_string(num_deaths));
+	g.draw(death_counter);
+	
 	health_bar.setPosition(sprt.getPosition());
 	
+	// draw the remaining hp
+	health_bar.setSize(sf::Vector2f(currhealth*CHARACTERS::HEALTHBAR_WIDTH/maxhealth, CHARACTERS::HEALTHBAR_HEIGHT));
 	health_bar.move(-CHARACTERS::HEALTHBAR_WIDTH/2, -(health_bar.getGlobalBounds().height + bounds().height)/2 - 5);
 	health_bar.setFillColor(sf::Color::Green);
 	g.draw(health_bar);
 	
+	// draw the missing hp
 	health_bar.setSize(sf::Vector2f((maxhealth - currhealth)*CHARACTERS::HEALTHBAR_WIDTH/maxhealth, CHARACTERS::HEALTHBAR_HEIGHT));
 	health_bar.move(currhealth*CHARACTERS::HEALTHBAR_WIDTH/maxhealth, 0);
 	health_bar.setFillColor(sf::Color::Red);
 	g.draw(health_bar);
 }
 
-void Character::update(sf::Vector2f pos, int hp) {
-	sprt.setPosition(pos);
-	currhealth = hp;
-	// currface = face;
+void Character::set_num_deaths(int _num_deaths) {
+	num_deaths = _num_deaths;
 }
 
 ID Character::getId() const{
@@ -184,12 +199,20 @@ int Character::getHealth() const {
 	return currhealth;
 }
 
+sf::Vector2f Character::getVel() const {
+	return vel;
+}
+
 int Character::get_strength() const {
 	return str;
 }
 
 Weapon* Character::get_weapon() const {
-	return weap;
+	return weapon;
+}
+
+int Character::get_num_deaths() const {
+	return num_deaths;
 }
 
 void War::Attack() {}

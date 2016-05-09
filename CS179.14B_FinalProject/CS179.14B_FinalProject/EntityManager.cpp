@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <algorithm>
+#include <fstream>
 
 void EntityManager::addMapTile(Tile* t) {
 	map.push_back(t);
@@ -15,12 +16,19 @@ void EntityManager::addSObject(SObject* so) {
 void EntityManager::setMain(Character* p, const sf::Vector2f& start_pos) {
 	main_player = std::move(p);
 	main_player->setPosition(start_pos);
+	std::ifstream death_counter_i("death.txt");
+	if (death_counter_i.is_open()) {
+		int num_deaths = 0;
+		death_counter_i >> num_deaths;
+		main_player->set_num_deaths(num_deaths);
+	}
 }
 
 void EntityManager::handleInput() {
 	main_player->handleInput();
 }
-void EntityManager::handleMouse(int key, sf::RenderWindow &g) {
+
+void EntityManager::handleMouse(int key, sf::RenderWindow& g) {
 	int command = main_player->handleMouse(key, g);
 	{
 		uint8_t buffer[sizeof(Message) + sizeof(AttackMessage)];
@@ -152,15 +160,20 @@ void EntityManager::update(float dt) {
 		}
 	}
 
-
+	if (main_player->is_dead()) {
+		main_player->revive();
+		death_counter_o.open("death.txt", std::ios::trunc);
+		death_counter_o << main_player->get_num_deaths();
+		death_counter_o.close();
+	}
 }
 
 void EntityManager::logic(float dt) {
 	resolveCollisions(dt);
 }
 
-void EntityManager::render(sf::RenderTarget &g) {
-	sf::RectangleShape x(sf::Vector2f(2000,2000));
+void EntityManager::render(sf::RenderTarget& g) {
+	sf::RectangleShape x(sf::Vector2f(2000, 2000));
 	x.setFillColor(sf::Color::White);
 	g.draw(x);
 	

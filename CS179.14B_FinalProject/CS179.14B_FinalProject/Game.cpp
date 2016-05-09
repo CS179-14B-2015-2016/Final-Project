@@ -1,5 +1,6 @@
-#include <iostream>
 #include <algorithm>
+#include <cassert>
+#include <iostream>
 #include <string>
 
 #include <SFML/Network.hpp>
@@ -36,7 +37,7 @@ bool Init(ID player_id, playerChar player) {
 				if (rgb == NORMAL_RGB) {
 					em->addMapTile(new  NormalTile(sf::Vector2f(x*TILE_SIZE, y*TILE_SIZE)));
 				} else if (rgb == LAVA_RGB) {
-					em->addMapTile(new  LavaTile(sf::Vector2f(x*TILE_SIZE, y*TILE_SIZE), LAVA_TIMER));
+					em->addMapTile(new  LavaTile(sf::Vector2f(x*TILE_SIZE, y*TILE_SIZE)));
 				} else if (rgb == TRAMPOLINE_RGB) {
 					em->addMapTile(new  TrampolineTile(sf::Vector2f(x*TILE_SIZE, y*TILE_SIZE)));
 				} else if (rgb == TAR_RGB) {
@@ -106,20 +107,17 @@ int main() {
 	bool isLoggedIn = false;
 	bool charSelected = false;
 	playerChar player = playerChar::PESTILENCE;
-	if (!Font.loadFromFile("font.ttf")) {
-		std::cout << "Can't load font" << std::endl;
-	}
+	assert(Font.loadFromFile("font.ttf"));
 	sf::RenderWindow loginScreen;
 	sf::RenderWindow characterSelection;
 	string ip;
 	string tempIP;
 	sf::Text displayIP(tempIP, Font, 50);
-	//displayIP.setPosition(200, 150);
+	// displayIP.setPosition(200, 150);
 	displayIP.setColor(sf::Color(44, 127, 255));
-	sf::FloatRect textRect = displayIP.getLocalBounds();
 
 	loginScreen.create(sf::VideoMode(400, 60), "ENTER IP ADDRESS:");
-	//loginScreen.setKeyRepeatEnabled(false);
+	// loginScreen.setKeyRepeatEnabled(false);
 
 	while (loginScreen.isOpen()) {
 		sf::Event loginEvent;

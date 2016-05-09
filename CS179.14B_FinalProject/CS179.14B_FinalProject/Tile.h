@@ -31,9 +31,7 @@ protected:
 	float timer;
 	float damageTimer;
 public:
-	LavaTile(const sf::Vector2f &init_pos, const float &damageTimer) : Tile(init_pos, GAME::LAVA_FILE) , damageTimer(damageTimer) {
-		timer = 0;
-	}
+	LavaTile(const sf::Vector2f &init_pos) : Tile(init_pos, GAME::LAVA_FILE), damageTimer(GAME::LAVA_TIMER), timer(0) {}
 	void update(float dt) override;
 	void collide(Entity* collided) override;
 };

@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cassert>
+#include <Windows.h>
+
 #include "Entities.h"
 #include "Weapon.h"
 #include "Game.h"
 #include "../GameMessage.h"
-
-#include <Windows.h>
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -20,8 +21,8 @@ namespace Keys {
 
 namespace CHARACTERS {
 	const auto BASE_SPEED = 32.0f;
-	const auto SPRITE_WIDTH = 32;
-	const auto SPRITE_HEIGHT = 48;
+	const auto SPRITE_WIDTH = 32.0f;
+	const auto SPRITE_HEIGHT = 48.0f;
 	const auto JUMP_RATE = -400.0f;
 	const auto HEALTHBAR_WIDTH = 40;
 	const auto HEALTHBAR_HEIGHT = 5;
@@ -34,7 +35,7 @@ namespace CHARACTERS {
 class Character : public Entity {
 private:
 	ID id;
-	Weapon* weap;
+	Weapon* weapon;
 	playerChar type;
 	
 	int str, agi, intel, pdef, mdef, currhealth, maxhealth, seq;
@@ -47,19 +48,25 @@ private:
 	float velXMultiplier;
 	bool can_jump;
 	
-	int death_count;
+	sf::RectangleShape health_bar;
+	sf::Text death_counter;
+	sf::Font font;
+	int num_deaths;
 	
 public:
-	Character(const int &str, const int &agi, const int &intel, const int &pdef, const int &mdef, int maxhealth, string file_name,ID id, Weapon *weap_in, playerChar type) : 
-		Entity(file_name, sf::Vector2i(CHARACTERS::SPRITE_WIDTH,CHARACTERS::SPRITE_HEIGHT)), str(str), agi(agi), intel(intel), pdef(pdef), mdef(mdef), currhealth(maxhealth), maxhealth(maxhealth), seq(0), id(id), can_jump(true), poison_timer(CHARACTERS::POISON_MAX_TIME), velXMultiplier(1), weap(weap_in), type(type), death_count(0) {
-		sprt.setOrigin(sf::Vector2f(CHARACTERS::SPRITE_WIDTH / 2.0f, CHARACTERS::SPRITE_HEIGHT / 2.0f));
-		currface = Face::NONE;
+	Character(const int &str, const int &agi, const int &intel, const int &pdef, const int &mdef, int maxhealth, string file_name,ID id, Weapon *weapon, playerChar type) : Entity(file_name, sf::Vector2i(CHARACTERS::SPRITE_WIDTH,CHARACTERS::SPRITE_HEIGHT)), str(str), agi(agi), intel(intel), pdef(pdef), mdef(mdef), currhealth(maxhealth), maxhealth(maxhealth), weapon(weapon), can_jump(true), poison_timer(CHARACTERS::POISON_MAX_TIME), velXMultiplier(1), id(id), seq(0), type(type), currface(Face::NONE), num_deaths(0), health_bar(sf::Vector2f(CHARACTERS::HEALTHBAR_WIDTH, CHARACTERS::HEALTHBAR_HEIGHT)), death_counter() {
+		sprt.setOrigin(sf::Vector2f(CHARACTERS::SPRITE_WIDTH/2, CHARACTERS::SPRITE_HEIGHT/2));
+		assert(font.loadFromFile("font.ttf"));
+		death_counter.setFont(font);
+		death_counter.setCharacterSize(12);
+		death_counter.setColor(sf::Color::Red);
 	}
 	virtual ~Character() {}
 
 	virtual void Attack() = 0;
 	virtual void SAttack() = 0;
 	bool isKeyDown(const int &key);
+	bool is_dead();
 	
 	void resetGravity();
 	void hit_head();
@@ -72,10 +79,13 @@ public:
 	void slow();
 	void boosted();
 	void poison();
+	void revive();
 	
 	void update(float dt) override;
 	void update(sf::Vector2f pos, int hp);
-	void render(sf::RenderTarget &g) override;
+	void render(sf::RenderTarget& g) override;
+	
+	void set_num_deaths(int _num_deaths);
 	
 	ID getId() const;
 	playerChar getType() const;
@@ -84,6 +94,7 @@ public:
 	int get_strength() const;
 	sf::Vector2f getVel() const;
 	Weapon* get_weapon() const;
+	int get_num_deaths() const;
 };
 
 class War : public Character {

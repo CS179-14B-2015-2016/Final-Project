@@ -11,8 +11,8 @@ protected:
 	
 public:
 	SObject(const sf::Vector2f &init_pos, std::string file_name, int barrelDurability) : Entity(file_name, sf::Vector2i(SOBJECT_SIZE, SOBJECT_SIZE)), barrelDurability(barrelDurability) {
-		sprt.setPosition(init_pos + sf::Vector2f(SOBJECT_SIZE / 2.0f, SOBJECT_SIZE / 2.0f));
-		sprt.setOrigin(sf::Vector2f(SOBJECT_SIZE / 2.0f, SOBJECT_SIZE / 2.0f));
+		sprt.setPosition(init_pos + sf::Vector2f(SOBJECT_SIZE/2, SOBJECT_SIZE/2));
+		sprt.setOrigin(sf::Vector2f(SOBJECT_SIZE/2, SOBJECT_SIZE/2));
 	}
 	virtual ~SObject() {}
 	

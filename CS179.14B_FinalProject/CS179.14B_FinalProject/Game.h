@@ -1,11 +1,11 @@
 #pragma once
 
 namespace GAME {
-	const auto WINDOW_WIDTH = 512;
-	const auto WINDOW_HEIGHT = 512;
+	const auto WINDOW_WIDTH = 512.0f;
+	const auto WINDOW_HEIGHT = 512.0f;
 
-	const auto TILE_SIZE = 32;
-	const auto SOBJECT_SIZE = 16;
+	const auto TILE_SIZE = 32.0f;
+	const auto SOBJECT_SIZE = 16.0f;
 	/*Tile Filenames*/
 	/*RGB*/
 	
@@ -14,7 +14,7 @@ namespace GAME {
 
 	const auto LAVA_FILE = "Art/Tiles/Lava_Tile_32.png"; // 75 75 0
 	const auto LAVA_RGB = sf::Vector3i(75, 75, 0);
-	const auto LAVA_TIMER = 2.5f;
+	const auto LAVA_TIMER = 1.0f;
 
 	const auto TRAMPOLINE_FILE = "Art/Tiles/Trampoline_Tile_32.png"; //0 75 75
 	const auto TRAMPOLINE_RGB = sf::Vector3i(0, 75, 75);

@@ -10,6 +10,7 @@
 #include "SFML/Network.hpp"
 
 #include <vector>
+#include <fstream>
 
 class EntityManager {
 private:
@@ -17,14 +18,19 @@ private:
 	
 public:
 	std::vector<Tile*> map;
+	std::vector<SObject*> sobjects;
+	
 	Character* main_player;
 	std::vector<Character*> other_players;
-	std::vector<SObject*> sobjects;
+	
 	sf::Sprite bg;
+	
 	sf::UdpSocket* socket;
 	sf::IpAddress address;
 	unsigned int port;
 	// socket.send(buffer, sizeof(buffer), server_address, port);
+	
+	std::ofstream death_counter_o;
 	
 	EntityManager(sf::UdpSocket* sock,const char* ip,const unsigned int &port) : socket(sock), address(ip), port(port) {
 		view.setSize(sf::Vector2f(GAME::WINDOW_WIDTH, GAME::WINDOW_HEIGHT));
@@ -39,10 +45,10 @@ public:
 	void setMain(Character* p, const sf::Vector2f& start_pos);
 	
 	void handleInput();
-	void handleMouse(int key, sf::RenderWindow &g);
+	void handleMouse(int key, sf::RenderWindow& g);
 	
 	void update(float dt);
-	void render(sf::RenderTarget &g);
+	void render(sf::RenderTarget& g);
 	
 	void logic(float dt);
 	void resolveCollisions(float dt);
