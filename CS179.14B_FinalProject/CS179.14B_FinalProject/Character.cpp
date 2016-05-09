@@ -112,12 +112,12 @@ void Character::update(float dt) {
 	weapon->update(dt);
 }
 
-void Character::update(sf::Vector2f pos, int hp) {
+void Character::update(sf::Vector2f pos, int hp, int _num_deaths) {
 	sprt.setPosition(pos);
-	currhealth = hp;
-	if (currhealth == 0) {
-		revive();
+	if (currhealth < hp) {
+		currhealth = hp;
 	}
+	num_deaths = _num_deaths;
 	// currface = face;
 }
 

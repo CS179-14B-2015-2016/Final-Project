@@ -95,7 +95,7 @@ void EntityManager::update(float dt) {
 							}
 						}
 					} else {
-						(*it)->update(sf::Vector2f(data->px, data->py), data->hp);
+						(*it)->update(sf::Vector2f(data->px, data->py), data->hp, data->num_deaths);
 					}
 					break;
 				}
@@ -153,6 +153,7 @@ void EntityManager::update(float dt) {
 		// data->vy = main_player->getVel().y;
 		// data->face = main_player->getFace();
 		data->hp = main_player->getHealth();
+		data->num_deaths = main_player->get_num_deaths();
 		// data->order = -1; // CHANGE THIS
 		data->unit = main_player->getType();
 		if (socket->send(buffer, sizeof(buffer), address, port) == !sf::Socket::Done) {

@@ -82,7 +82,7 @@ public:
 	void revive();
 	
 	void update(float dt) override;
-	void update(sf::Vector2f pos, int hp);
+	void update(sf::Vector2f pos, int hp, int _num_deaths);
 	void render(sf::RenderTarget& g) override;
 	
 	void set_num_deaths(int _num_deaths);

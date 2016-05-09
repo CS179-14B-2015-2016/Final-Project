@@ -36,6 +36,7 @@ struct StatusMessage {
 	float px, py;
 	// float vx, vy;
 	int hp;
+	int num_deaths;
 	// Face face;
 	playerChar unit;
 };
