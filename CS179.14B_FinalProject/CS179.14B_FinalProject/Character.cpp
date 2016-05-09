@@ -39,16 +39,11 @@ int Character::handleMouse(int key,sf::RenderWindow &win) {
 void Character::handleInput(){
 	vel.x = 0.0;
 	Face temp = Face::NONE;
-	if (!isColTile) {
-		//cout << "reset" << endl;
-		velXMultiplier = 1.0f;
-	}
-	else {
-		//cout << "don't reset" << endl;
-	}
+	
 	if (isKeyDown(Keys::JUMP) && can_jump) { // jump
 		temp = Face::FRONT;
 		vel.y = CHARACTERS::JUMP_RATE;
+		velXMultiplier = 1;
 	}
 	else if (isKeyDown(Keys::DOWN)) {/*drop down?*/ }
 	
@@ -106,14 +101,17 @@ void Character::update(float dt) {
 	sprt.move(vel*dt);
 	
 	vel.y += GRAV;
+	
 	can_jump = false;
-	weap->setPos(sprt.getPosition());
+	
+	weap->setPosition(sprt.getPosition());
 	weap->update(dt);
 }
 
 void Character::resetGravity() {
 	vel.y = 0;
 	can_jump = true;
+	velXMultiplier = 1;
 }
 
 void Character::hit_head() {
@@ -135,6 +133,10 @@ void Character::poison() {
 
 void Character::takeDamage(int damage){
 	currhealth = std::max(0, currhealth - damage);
+	if (currhealth == 0) {
+		currhealth = maxhealth;
+		++death_count;
+	}
 }
 void Character::heal(int heal){
 	currhealth = std::min(maxhealth, currhealth + heal);
@@ -161,14 +163,10 @@ void Character::render(sf::RenderTarget &g) {
 	g.draw(health_bar);
 }
 
-void Character::update(sf::Vector2f pos, sf::Vector2f vel, Face face) {
-	setPos(pos);
+void Character::update(sf::Vector2f pos, int hp) {
+	sprt.setPosition(pos);
+	currhealth = hp;
 	// currface = face;
-	this->vel = vel;
-}
-
-void Character::setCollision(bool tile) {
-	isColTile = tile;
 }
 
 ID Character::getId() const{

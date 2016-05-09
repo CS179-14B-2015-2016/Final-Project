@@ -32,11 +32,11 @@ struct Message {
 };
 
 struct StatusMessage {
-	uint32_t order;
+	// uint32_t order;
 	float px, py;
-	float vx, vy;
-	Face face;
+	// float vx, vy;
 	int hp;
+	// Face face;
 	playerChar unit;
 };
 

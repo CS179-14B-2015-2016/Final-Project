@@ -1,12 +1,16 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+
 #include <map>
 #include <iostream>
 
+#include <SFML/Graphics.hpp>
+
 using namespace std;
+
 class TextureLoader {
 protected:
 	map<std::string, sf::Texture*> textures;
+	
 public:
 	TextureLoader() {}
 	~TextureLoader() {

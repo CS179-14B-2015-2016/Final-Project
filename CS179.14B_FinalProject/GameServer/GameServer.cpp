@@ -11,7 +11,7 @@
 
 #include <boost/asio.hpp>
 
-#include "GameMessage.h"
+#include "../GameMessage.h"
 
 using namespace std;
 
@@ -27,13 +27,9 @@ struct Client{
 	chrono::time_point<Clock> last_packet;
 	std::vector<uint8_t> send_buf;
 
-	void send(MessageType message_type, BroadcastType broadcast_type, const void *data, size_t length) {
-		send_buf.resize(sizeof(Message) + length);
-		auto p = reinterpret_cast<Message*>(send_buf.data());
-		p->message_type = message_type;
-		p->broadcast_type = broadcast_type;
-		p->size = length;
-		memcpy(p->data, data, length);
+	void send(Message* message) {
+		send_buf.resize(sizeof(Message) + message->size);
+		memcpy(send_buf.data(), message, send_buf.size());
 		// cout << "Sending data of total size: " << send_buf.size() << endl;
 		socket.async_send_to(boost::asio::buffer(send_buf), endpoint, [this](auto error, auto size) {
 			// cout << "Send success\n";
@@ -57,13 +53,15 @@ int main(int argc, char **argv) {
 		boost::asio::ip::udp::endpoint source; /*server's endpoint*/
 
 		std::function<void(boost::system::error_code, size_t)> handler = [&](boost::system::error_code err, size_t length) {
-			auto message = reinterpret_cast<const Message*>(recv_buffer.data());
+			auto message = reinterpret_cast<Message*>(recv_buffer.data());
 			// cout << "INCOMING" << endl;
 			switch (message->message_type) {
 				case MessageType::Connect: {
 					ID id = id_counter++;
+					message->origin = id;
+					std::cout << "Connecting. Client id: " << id << std::endl;
 					auto result = clients.emplace(id, Client{ id, source, socket,Clock::now() });
-					result.first->second.send(message->message_type, BroadcastType::None, &id, sizeof(id));
+					result.first->second.send(message);
 					break;
 				}
 				case MessageType::Disconnect: {
@@ -78,7 +76,7 @@ int main(int argc, char **argv) {
 					// cout << "Recevied Status Message from: " << pm->id << endl;
 					for (auto &client : clients) {
 						if (client.first != message->origin) {
-							client.second.send(message->message_type, message->broadcast_type, message->data, message->size);
+							client.second.send(message);
 						} else {
 							client.second.last_packet = Clock::now();
 							client.second.endpoint = source;

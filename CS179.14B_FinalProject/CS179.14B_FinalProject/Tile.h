@@ -10,8 +10,8 @@ protected:
 
 public:
 	Tile(const sf::Vector2f &init_pos, std::string file_name) : Entity(file_name,sf::Vector2i(TILE_SIZE,TILE_SIZE)) {
-		setPos(init_pos + sf::Vector2f(TILE_SIZE / 2.0f, TILE_SIZE / 2.0f));
-		setOrigin(sf::Vector2f(TILE_SIZE / 2.0f, TILE_SIZE / 2.0f));
+		sprt.setPosition(init_pos + sf::Vector2f(TILE_SIZE / 2.0f, TILE_SIZE / 2.0f));
+		sprt.setOrigin(sf::Vector2f(TILE_SIZE / 2.0f, TILE_SIZE / 2.0f));
 	}
 	virtual ~Tile() {}
 	

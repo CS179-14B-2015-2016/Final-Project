@@ -1,12 +1,8 @@
 #include "EntityManager.h"
-#include "GameMessage.h"
+#include "../GameMessage.h"
 
 #include <cassert>
 #include <algorithm>
-
-void EntityManager::addPlayer(Character* p) {
-	other_players.push_back(p);
-}
 
 void EntityManager::addMapTile(Tile* t) {
 	map.push_back(t);
@@ -16,8 +12,9 @@ void EntityManager::addSObject(SObject* so) {
 	sobjects.push_back(so);
 }
 
-void EntityManager::setMain(Character* p) {
+void EntityManager::setMain(Character* p, const sf::Vector2f& start_pos) {
 	main_player = std::move(p);
+	main_player->setPosition(start_pos);
 }
 
 void EntityManager::handleInput() {
@@ -39,6 +36,7 @@ void EntityManager::handleMouse(int key, sf::RenderWindow &g) {
 		}
 	}
 }
+
 void EntityManager::update(float dt) {
 	{
 		sf::Packet packet;
@@ -56,40 +54,40 @@ void EntityManager::update(float dt) {
 					if (it == other_players.end()) {
 						switch (data->unit) {
 							case playerChar::WAR: {
-								other_players.emplace_back(new War(10, 7, 2, 7, 3, 10, sf::Vector2f(data->px, data->py), message->origin));
+								other_players.emplace_back(new War(message->origin));
 								break;
 							}
 							case playerChar::PESTILENCE: {
-								other_players.emplace_back(new Pestilence(7, 10, 2, 5, 5, 20, sf::Vector2f(data->px, data->py), message->origin));
+								other_players.emplace_back(new Pestilence(message->origin));
 								break;
 							}
 							case playerChar::FAMINE: {
-								other_players.emplace_back(new Famine(2, 7, 10, 3, 7, 20, sf::Vector2f(data->px, data->py), message->origin));
+								other_players.emplace_back(new Famine(message->origin));
 								break;
 							}
 							case playerChar::DEATH: {
-								other_players.emplace_back(new Death(10, 2, 7, 3, 7, 20, sf::Vector2f(data->px, data->py), message->origin));
+								other_players.emplace_back(new Death(message->origin));
 								break;
 							}
 							case playerChar::MATTHEW: {
-								other_players.emplace_back(new Matthew(2, 7, 10, 3, 7, 20, sf::Vector2f(data->px, data->py), message->origin));
+								other_players.emplace_back(new Matthew(message->origin));
 								break;
 							}
 							case playerChar::MARK: {
-								other_players.emplace_back(new Mark(10, 7, 2, 7, 3, 20, sf::Vector2f(data->px, data->py), message->origin));
+								other_players.emplace_back(new Mark(message->origin));
 								break;
 							}
 							case playerChar::LUKE: {
-								other_players.emplace_back(new Luke(10, 7, 2, 7, 3, 20, sf::Vector2f(data->px, data->py), message->origin));
+								other_players.emplace_back(new Luke(message->origin));
 								break;
 							}
 							case playerChar::JOHN: {
-								other_players.emplace_back(new John(7, 10, 2, 7, 3, 20, sf::Vector2f(data->px, data->py), message->origin));
+								other_players.emplace_back(new John(message->origin));
 								break;
 							}
 						}
 					} else {
-						(*it)->update(sf::Vector2f(data->px, data->py), sf::Vector2f(data->vx, data->vy), data->face);
+						(*it)->update(sf::Vector2f(data->px, data->py), data->hp);
 					}
 					break;
 				}
@@ -143,11 +141,11 @@ void EntityManager::update(float dt) {
 		message->size = sizeof(StatusMessage);
 		data->px = main_player->getPosition().x;
 		data->py = main_player->getPosition().y;
-		data->vx = main_player->getVel().x;
-		data->vy = main_player->getVel().y;
-		data->face = main_player->getFace();
+		// data->vx = main_player->getVel().x;
+		// data->vy = main_player->getVel().y;
+		// data->face = main_player->getFace();
 		data->hp = main_player->getHealth();
-		data->order = -1; // CHANGE THIS
+		// data->order = -1; // CHANGE THIS
 		data->unit = main_player->getType();
 		if (socket->send(buffer, sizeof(buffer), address, port) == !sf::Socket::Done) {
 			std::cout << "Not sending data" << std::endl;
@@ -262,7 +260,7 @@ void EntityManager::resolveCollisions(float dt) {
 	//checks sobject collision
 	for (int i = 0; i < sobjects.size(); i++) {
 		if (has_collided(sobjects[i], main_player)) {}
-		if (has_collided(main_player->get_weapon(), sobjects[i])) {
+		if (main_player->get_weapon()->is_attacking() && has_collided(main_player->get_weapon(), sobjects[i])) {
 			sobjects[i]->damage();
 			if (sobjects[i]->can_be_destroyed()) {
 				sobjects[i]->collide(main_player);
@@ -275,16 +273,6 @@ void EntityManager::resolveCollisions(float dt) {
 		if (u->get_weapon()->is_attacking() && has_collided(u->get_weapon(), main_player)) {
 			u->get_weapon()->hit();
 			main_player->takeDamage(1);
-			
-			uint8_t buffer[sizeof(Message)];
-			auto message = reinterpret_cast<Message*>(buffer);
-			message->origin = main_player->getId();
-			message->message_type = MessageType::Broadcast;
-			message->broadcast_type = BroadcastType::Hit;
-			message->size = 0;
-			if (socket->send(buffer, sizeof(buffer), address, port) == !sf::Socket::Done) {
-				std::cout << "Not sending data" << std::endl;
-			}
 		}
 		/* if (main_player->get_weapon()->is_attacking() && has_collided(main_player->get_weapon(), u)) {
 			main_player->get_weapon()->hit();

@@ -8,7 +8,7 @@ void Entity::move(const sf::Vector2f &amount) {
 	sprt.move(amount);
 }
 
-void Entity::setPos(const sf::Vector2f &newPos) {
+void Entity::setPosition(const sf::Vector2f &newPos) {
 	sprt.setPosition(newPos);
 }
 

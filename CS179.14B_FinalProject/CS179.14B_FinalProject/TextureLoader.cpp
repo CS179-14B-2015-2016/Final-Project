@@ -1,7 +1,5 @@
 #include "TextureLoader.h"
 
-
-
 sf::Texture* TextureLoader::getTexture(string n) {
 	sf::Texture* temp = NULL;
 	map<string, sf::Texture*>::const_iterator results = textures.find(n);
@@ -20,4 +18,3 @@ sf::Texture* TextureLoader::getTexture(string n) {
 	}
 	return temp;
 }
-
