@@ -13,7 +13,7 @@ GameState::GameState(StateManager* sm): State(sm), sm(sm){
 }
 
 void GameState::serverLoop(bool generateMap, size_t player, std::string username) {
-
+	yourID = 0;
 	readyClients = 1;
 	totalClients = stillConnected = player;
 
@@ -449,4 +449,12 @@ void GameState::takeJewel(int i, int j) {
 	assert(mapData[i][j] == 2);
 	mapData[i][j] = 0;
 	map->getTile(i, j)->setType(0);
+
+	auto toSend = JewelTakenMessage{ (uint8_t)i, (uint8_t)j };
+	auto mh = MessageHeader{ MessageType::JEWEL_TAKEN, sizeof(JewelTakenMessage) };
+	std::vector<uint8_t> sendBuffer;
+	sendBuffer.resize(sizeof(MessageHeader) + mh.size);
+	memcpy(sendBuffer.data(), &mh, sizeof(MessageHeader));
+	memcpy(sendBuffer.data() + sizeof(MessageHeader), &toSend, mh.size);
+	broadcast(sendBuffer);
 }

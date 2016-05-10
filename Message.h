@@ -10,6 +10,7 @@ enum MessageType : uint8_t {
 	GAME_START,		// server->client: string( "" )
 	UPDATE_INPUT,	// client->server: UpdateInputMessage{  }
 	UPDATE_DATA,	// server->client: UpdateDataMessage{  }
+	JEWEL_TAKEN,	// server->client: JewelTakenMessage()
 	GAME_FINISH,	// server->client: string( "" )
 	DISCONNECT		// client->server: string( "" )
 };
@@ -45,4 +46,9 @@ struct UpdateInputMessage {
 	
 	bool interact;
 	bool shift;
+};
+
+struct JewelTakenMessage {
+	uint8_t i;
+	uint8_t j;
 };

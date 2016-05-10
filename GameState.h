@@ -71,6 +71,7 @@ private:
 	void readKeyBindings();
 public:
 	static const uint16_t tcpPort = 8080;
+	uint8_t yourID;
 
     GameState(StateManager* sm);
     void serverLoop(bool generateMap, size_t players, std::string username);

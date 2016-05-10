@@ -38,7 +38,7 @@ void Tile::setType(int type) {
     }
 	else if (type == 2) {
 		this->passability = false;
-		this->shape.setFillColor(sf::Color::Yellow);
+		this->shape.setFillColor(sf::Color::Black);
 	}
 	else if (type == 3) {
 		this->passability = true;
@@ -56,9 +56,10 @@ bool Tile::isPassable() {
 
 void Tile::draw(sf::RenderWindow* window) {
 	if (type == 2)
+		this->shape.setFillColor(sf::Color::Black);
+	window->draw(this->shape);
+	if (type == 2)
 		window->draw(toDraw);
-	else
-		window->draw(this->shape);
 }
 float Tile::getX(){
     return cx;

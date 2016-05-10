@@ -83,6 +83,7 @@ void ClientConnection::interpretData() {
 			std::string idSubstring;
 			ss >> idSubstring;
 			id = std::atoi(idSubstring.c_str());
+			gamestate->yourID = id;
 
 			username = "";
 			std::string temp;
@@ -147,11 +148,12 @@ void ClientConnection::interpretData() {
 		}
 		case MessageType::UPDATE_DATA: {
 			auto data = reinterpret_cast<UpdateDataMessage*>(recBuffer.data());
-
-			gamestate->dataMtx.lock();
 			(*gamestate->entities)[data->ID]->update(*data);
-			gamestate->dataMtx.unlock();
-
+			break;
+		}
+		case MessageType::JEWEL_TAKEN: {
+			auto jewel = reinterpret_cast<JewelTakenMessage*>(recBuffer.data());
+			gamestate->map->getTile(jewel->i, jewel->j)->setType(0);
 			break;
 		}
 		case MessageType::GAME_FINISH: {

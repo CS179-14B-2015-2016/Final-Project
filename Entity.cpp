@@ -124,7 +124,7 @@ void Entity::update(float delta)
 			else
 			{
 				moveUp = moveDown = moveLeft = moveRight = false;
-				randomValue = rand() % 5;
+				randomValue = rand() % 6;
 
 				if (randomValue==0)			moveUp = true;
 				else if (randomValue==1)	moveDown = true;
@@ -173,10 +173,11 @@ void Entity::update(float delta)
 				if (object != nullptr && object->isAlive)
 				{
 					this->currCostume = object->currCostume;
+					sheet = SpriteSheetLoader::getInstance()->getSpriteSheet(filepaths[currCostume]);
 				}
 			}
 
-			interact = false;
+			shift = false;
 		}
 
 		if (moveUp && !moveDown)
@@ -260,8 +261,20 @@ void Entity::draw(sf::RenderWindow& window) const {
 	if (isAlive)
 	{
 		sf::Sprite toDraw(*sheet, sf::IntRect(spriteAction * 32, spriteDir * 32, 32, 32));
-		toDraw.setPosition(pos.y, pos.x);
-		window.draw(toDraw);
+
+		if (this->id == gamestate->yourID)
+		{
+			sf::View player_view(sf::FloatRect(0, 0, window.getSize().x/2.0, window.getSize().y/2.0));
+			toDraw.setPosition(pos.y, pos.x);
+			player_view.setCenter(pos.y+16, pos.x+16);
+			window.setView(player_view);
+			window.draw(toDraw);
+		}
+		else
+		{
+			toDraw.setPosition(pos.y, pos.x);
+			window.draw(toDraw);
+		}
 	}
 }
 
