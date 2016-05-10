@@ -60,6 +60,7 @@ private:
 	std::string checkName(const std::string& desired);
 	void registerName(std::string username);
 	void readMapFromFile();
+	void compressMap();
 	void positionEntities();
 	sf::Vector2i findFreePosition();
 

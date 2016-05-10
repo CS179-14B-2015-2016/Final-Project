@@ -26,16 +26,7 @@ void GameState::serverLoop(bool generateMap, size_t player, std::string username
 
 	auto pos = findFreePosition();
 
-	compressedMap = "";
-	for (int i = 0; i < map->getHeight(); i++)
-	{
-		std::string line = "";
-		for (int j = 0; j < map->getWidth(); j++)
-		{
-			line += std::to_string( (unsigned int)mapData[i][j] );
-		}
-		compressedMap += line;
-	}
+	compressMap();
 
 	nameList = new std::set<std::string>();
 	endpoint = new ip::tcp::endpoint(ip::tcp::v4(), GameState::tcpPort);
@@ -174,6 +165,19 @@ void GameState::onActivate(const std::string& activate) {
 			username = username.substr(0, username.length() - 1);
 
 		networkThread = new std::thread(&GameState::clientLoop, this, ipAddress, username);
+	}
+}
+
+void GameState::compressMap() {
+	compressedMap = "";
+	for (int i = 0; i < map->getHeight(); i++)
+	{
+		std::string line = "";
+		for (int j = 0; j < map->getWidth(); j++)
+		{
+			line += std::to_string((unsigned int)mapData[i][j]);
+		}
+		compressedMap += line;
 	}
 }
 
@@ -354,14 +358,15 @@ void GameState::handleInput(int u, int v, const std::string& typed, sf::Event e)
 }
 
 void GameState::update(float dt) {
-	if (inGame) {
+	if (inGame) 
+	{
 
 		static int counter = 1;
 		if (isHost)
 		{
-			static float k = 60;
-			k -= dt;
-			if (k <= 0)
+			static float timeRemaining = Universal::GAME_DURATION;
+			timeRemaining -= dt;
+			if (timeRemaining <= 0)
 			{
 				inGame = false;
 				isFinished = true;
@@ -399,11 +404,10 @@ void GameState::update(float dt) {
 		}
 		else
 		{
-			sm->push(5, compressedMap);
 		}
 	}
-	else {
-
+	else if(isFinished) {
+		sm->push(5, compressedMap);
 	} 
 }
 

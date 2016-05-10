@@ -7,6 +7,7 @@ ClientConnection::ClientConnection(io_service& service, GameState* gamestate) :
 	gamestate(gamestate),
 	isActive(true)
 {
+	socket.open(ip::tcp::v4());
 	socket.set_option(ip::tcp::no_delay(true));
 }
 
@@ -120,6 +121,7 @@ void ClientConnection::interpretData() {
 				}
 			}
 			gamestate->map = new Map(gamestate->mapData, recdata->height, recdata->width);
+			gamestate->compressMap();
 
 			gamestate->entities = new std::vector<std::shared_ptr<Entity>>();
 			gamestate->entities->resize(gamestate->totalClients*3);

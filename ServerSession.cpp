@@ -11,6 +11,7 @@ ServerSession::ServerSession(ip::tcp::socket socket, uint8_t id, GameState* game
 	isActive(true),
 	id(id)
 {
+	socket.open(ip::tcp::v4());
 	socket.set_option(ip::tcp::no_delay(true));
 	receiveHeader();
 }
