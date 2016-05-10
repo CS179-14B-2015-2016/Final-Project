@@ -7,6 +7,7 @@ ClientConnection::ClientConnection(io_service& service, GameState* gamestate) :
 	gamestate(gamestate),
 	isActive(true)
 {
+	socket.set_option(ip::tcp::no_delay(true));
 }
 
 void ClientConnection::connect(std::string host, std::string username) {

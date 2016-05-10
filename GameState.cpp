@@ -380,7 +380,6 @@ void GameState::update(float dt) {
 				}
 
 				std::cout << "Broadcasted GAME FINISH to everyone" << std::endl;
-				sm->push(5, compressedMap);
 			}
 			else
 			{
@@ -400,7 +399,7 @@ void GameState::update(float dt) {
 		}
 		else
 		{
-			
+			sm->push(5, compressedMap);
 		}
 	}
 	else {

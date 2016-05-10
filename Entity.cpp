@@ -103,46 +103,61 @@ void Entity::update(float delta)
 	}
 	else
 	{
+		if (!isPlayer)
+		{
+		}
 
-		if (moveUp && !moveDown && gamestate->isMapFree(curr.x - 1, curr.y))
+		if (moveUp && !moveDown)
 		{
-			timeLeft = 0.3;
-			gamestate->reserveMap(curr.x-1, curr.y);
-			isMoving = true;
-			dir = sf::Vector2f(-1, 0);
-			next = sf::Vector2i(curr.x-1, curr.y);
 			spriteDir = 3;
-			spriteAction = 1;
+			if (gamestate->isMapFree(curr.x - 1, curr.y))
+			{
+				timeLeft = 0.3;
+				gamestate->reserveMap(curr.x - 1, curr.y);
+				isMoving = true;
+				dir = sf::Vector2f(-1, 0);
+				next = sf::Vector2i(curr.x - 1, curr.y);
+				spriteAction = 1;
+			}
 		}
-		else if (moveDown && !moveUp && gamestate->isMapFree(curr.x + 1, curr.y))
+		else if (moveDown && !moveUp)
 		{
-			timeLeft = 0.3;
-			gamestate->reserveMap(curr.x + 1, curr.y);
-			isMoving = true;
-			dir = sf::Vector2f(1, 0);
-			next = sf::Vector2i(curr.x + 1, curr.y);
 			spriteDir = 0;
-			spriteAction = 1;
+			if (gamestate->isMapFree(curr.x + 1, curr.y))
+			{
+				timeLeft = 0.3;
+				gamestate->reserveMap(curr.x + 1, curr.y);
+				isMoving = true;
+				dir = sf::Vector2f(1, 0);
+				next = sf::Vector2i(curr.x + 1, curr.y);
+				spriteAction = 1;
+			}
 		}
-		else if (moveLeft && !moveRight && gamestate->isMapFree(curr.x, curr.y - 1))
+		else if (moveLeft && !moveRight)
 		{
-			timeLeft = 0.3;
-			gamestate->reserveMap(curr.x, curr.y - 1);
-			isMoving = true;
-			dir = sf::Vector2f(0, -1);
-			next = sf::Vector2i(curr.x, curr.y - 1);
 			spriteDir = 1;
-			spriteAction = 1;
+			if (gamestate->isMapFree(curr.x, curr.y - 1))
+			{
+				timeLeft = 0.3;
+				gamestate->reserveMap(curr.x, curr.y - 1);
+				isMoving = true;
+				dir = sf::Vector2f(0, -1);
+				next = sf::Vector2i(curr.x, curr.y - 1);
+				spriteAction = 1;
+			}
 		}
-		else if (moveRight && !moveLeft && gamestate->isMapFree(curr.x, curr.y + 1))
+		else if (moveRight && !moveLeft)
 		{
-			timeLeft =0.3;
-			gamestate->reserveMap(curr.x, curr.y + 1);
-			isMoving = true;
-			dir = sf::Vector2f(0, 1);
-			next = sf::Vector2i(curr.x, curr.y + 1);
 			spriteDir = 2;
-			spriteAction = 1;
+			if (gamestate->isMapFree(curr.x, curr.y + 1)) 
+			{
+				timeLeft = 0.3;
+				gamestate->reserveMap(curr.x, curr.y + 1);
+				isMoving = true;
+				dir = sf::Vector2f(0, 1);
+				next = sf::Vector2i(curr.x, curr.y + 1);
+				spriteAction = 1;
+			}
 		}
 	}
 }
