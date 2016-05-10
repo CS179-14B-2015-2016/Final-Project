@@ -360,14 +360,14 @@ void GameState::handleInput(int u, int v, const std::string& typed, sf::Event e)
 void GameState::update(float dt) {
 	if (inGame) 
 	{
-
-		static int counter = 1;
 		if (isHost)
 		{
 			static float timeRemaining = Universal::GAME_DURATION;
 			timeRemaining -= dt;
+			std::cout << timeRemaining << std::endl;
 			if (timeRemaining <= 0)
 			{
+
 				inGame = false;
 				isFinished = true;
 
@@ -426,10 +426,30 @@ bool GameState::isMapFree(int i, int j) {
 	return mapData[i][j] == 0 || mapData[i][j] == 3;
 }
 
-void GameState::reserveMap(int i, int j) {
-	mapData[i][j] = 8;
+void GameState::reserveMap(int i, int j, uint8_t replacement) {
+	mapData[i][j] = replacement;
 }
 
 void GameState::freeMap(int i, int j) {
 	mapData[i][j] = 0;
+}
+
+uint8_t GameState::getEntityCode(int i, int j) {
+	return mapData[i][j];
+}
+
+std::shared_ptr<Entity> GameState::getEntityAt(int i, int j) {
+	for (auto entity : *entities)
+	{
+		auto pos = entity->getPosition();
+		if (pos.x == i && pos.y == j)
+			return entity;
+	}
+	return nullptr;
+}
+
+void GameState::takeJewel(int i, int j) {
+	assert(mapData[i][j] == 2);
+	mapData[i][j] = 0;
+	map->getTile(i, j)->setType(0);
 }

@@ -2,15 +2,15 @@
 #define TILE_H_INCLUDED
 
 
-#include "SFML/Graphics/RenderWindow.hpp"
-#include "SFML/Graphics/RectangleShape.hpp"
+#include <SFML/Graphics.hpp>
 
 class Tile {
 	private:
 		float cx, cy;
 		int type;
 		bool passability;
-
+		sf::Texture jewelSprite;
+		sf::Sprite toDraw;
 		sf::RectangleShape shape;
 
 	public:

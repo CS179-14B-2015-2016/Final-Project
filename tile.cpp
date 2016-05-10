@@ -12,6 +12,9 @@ Tile::Tile(float cx, float cy, int type, bool passability) {
 	this->shape = sf::RectangleShape(sf::Vector2f(Tile::tileSize, Tile::tileSize));
 	this->shape.setPosition(sf::Vector2f((cx - (Tile::tileSize / 2)), (cy - (Tile::tileSize / 2))));
 	this->shape.setFillColor((type == 0)?(sf::Color::White):(sf::Color::Black));
+	jewelSprite.loadFromFile("assets/sprites/jewel.png");
+	toDraw = sf::Sprite(jewelSprite);
+	toDraw.setPosition(sf::Vector2f((cx - (Tile::tileSize / 2)), (cy - (Tile::tileSize / 2))));
 }
 
 int Tile::getType() {
@@ -52,7 +55,10 @@ bool Tile::isPassable() {
 }
 
 void Tile::draw(sf::RenderWindow* window) {
-	window->draw(this->shape);
+	if (type == 2)
+		window->draw(toDraw);
+	else
+		window->draw(this->shape);
 }
 float Tile::getX(){
     return cx;

@@ -82,8 +82,11 @@ public:
     void draw(sf::RenderWindow& window) const;
 
 	bool isMapFree(int i, int j);
-	void reserveMap(int i, int j);
+	void reserveMap(int i, int j, uint8_t replacement=8);
 	void freeMap(int i, int j);
+	uint8_t getEntityCode(int i, int j);
+	std::shared_ptr<Entity> getEntityAt(int i, int j);
+	void takeJewel(int i, int j);
 };
 
 #endif // GAMESTATE_H_INCLUDED

@@ -27,6 +27,7 @@ class Entity
 	sf::Vector2i next;
 	sf::Vector2f pos;
 	sf::Vector2f dir;
+	int score;
 	int spriteDir;
 	int spriteAction;
 	int currCostume;
@@ -53,6 +54,7 @@ public:
 	void update(const UpdateDataMessage& e);
 	void draw(sf::RenderWindow& window) const;
 	UpdateDataMessage getData() const;
+	sf::Vector2i getPosition() const;
 	void die();
 };
 

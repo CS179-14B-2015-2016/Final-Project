@@ -29,6 +29,7 @@ Entity::Entity(int row, int col, GameState* gamestate, bool isPlayer, uint8_t id
 	next(row, col),
 	pos(row * 32, col * 32),
 	dir(0, 0),
+	score(0),
 	spriteDir(0),
 	spriteAction(0),
 	currCostume(0),
@@ -65,9 +66,6 @@ void Entity::handleInput(const UpdateInputMessage& input)
 	this->moveRight = input.moveRight;
 	this->interact = input.interact;
 	this->shift = input.shift;
-
-	if(moveUp && moveDown)
-		std::cout << (int)id << " moves UP and DOWN!" << std::endl;
 }
 
 void Entity::update(float delta)
@@ -75,7 +73,6 @@ void Entity::update(float delta)
 	if (!isAlive)
 		return;
 
-	std::cout << (int)id << " is updating!" << std::endl;
 	if (isMoving)
 	{
 		pos += delta * (float)(32.0 / 0.3) * dir;
@@ -103,8 +100,67 @@ void Entity::update(float delta)
 	}
 	else
 	{
+		auto nextX = curr.x;
+		auto nextY = curr.y;
+
+		if (spriteDir == 3)
+			nextX--;
+		else if (spriteDir == 0)
+			nextX++;
+		else if (spriteDir == 1)
+			nextY--;
+		else if (spriteDir == 2)
+			nextY++;
+
 		if (!isPlayer)
 		{
+			auto randomValue = rand() % 2;
+
+			if (randomValue == 0 && gamestate->isMapFree(nextX, nextY))
+			{
+				isMoving = true;
+			}
+			else
+			{
+				moveUp = moveDown = moveLeft = moveRight = false;
+				randomValue = rand() % 5;
+
+				if (randomValue==0)			moveUp = true;
+				else if (randomValue==1)	moveDown = true;
+				else if (randomValue==2)	moveLeft = true;
+				else if (randomValue==3)	moveRight = true;
+				else						timeLeft = 0.6;
+			}
+		}
+		
+		if (isPlayer && interact) 
+		{
+			auto objectCode = gamestate->getEntityCode(nextX, nextY);
+			if (objectCode == 2)
+			{
+				score++;
+				gamestate->takeJewel(nextX, nextY);
+			}
+			else if (objectCode == 8)
+			{
+				auto object = gamestate->getEntityAt(nextX, nextY);
+				if (object != nullptr && object->spriteDir==this->spriteDir)
+				{
+					if (object->isPlayer)
+					{
+						this->score += object->score;
+						object->score = 0;
+					}
+					else
+					{
+						this->score = 0;
+						this->die();
+					}
+					object->die();
+				}
+			}
+
+			interact = false;
 		}
 
 		if (moveUp && !moveDown)
@@ -182,14 +238,20 @@ UpdateDataMessage Entity::getData() const {
 }
 
 void Entity::draw(sf::RenderWindow& window) const {
-	if (!isAlive)
-		return;
-
-	sf::Sprite toDraw(*sheet, sf::IntRect(spriteAction * 32, spriteDir * 32, 32, 32));
-	toDraw.setPosition(pos.y, pos.x);
-	window.draw(toDraw);
+	if (isAlive)
+	{
+		sf::Sprite toDraw(*sheet, sf::IntRect(spriteAction * 32, spriteDir * 32, 32, 32));
+		toDraw.setPosition(pos.y, pos.x);
+		window.draw(toDraw);
+	}
 }
 
 void Entity::die() {
 	isAlive = false;
+	gamestate->freeMap(curr.x, curr.y);
+}
+
+sf::Vector2i Entity::getPosition() const
+{
+	return curr;
 }
