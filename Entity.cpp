@@ -44,7 +44,8 @@ Entity::Entity(int row, int col, GameState* gamestate, bool isPlayer, uint8_t id
 	frameTic( 1 / 4.0f ),
 	frameCounter(0)
 {
-	filepaths = new std::string[6]{ "assets/sprites/lady1.png",
+	filepaths = new std::string[6]{
+		"assets/sprites/lady1.png",
 		"assets/sprites/lady2.png",
 		"assets/sprites/lady3.png",
 		"assets/sprites/man1.png",
@@ -163,6 +164,21 @@ void Entity::update(float delta)
 			interact = false;
 		}
 
+		if (isPlayer && shift)
+		{
+			auto objectCode = gamestate->getEntityCode(nextX, nextY);
+			if (objectCode == 8)
+			{
+				auto object = gamestate->getEntityAt(nextX, nextY);
+				if (object != nullptr && object->isAlive)
+				{
+					this->currCostume = object->currCostume;
+				}
+			}
+
+			interact = false;
+		}
+
 		if (moveUp && !moveDown)
 		{
 			spriteDir = 3;
@@ -230,10 +246,13 @@ void Entity::update(const UpdateDataMessage& data)
 	this->spriteDir = data.spriteDir;
 	this->spriteAction = data.spriteAction;
 	this->currCostume = data.currCostume;
+
 	sheet = SpriteSheetLoader::getInstance()->getSpriteSheet(filepaths[currCostume]);
 }
 
 UpdateDataMessage Entity::getData() const {
+	if (id == 2)
+		std::cout << "Telling the future I am wearing the costume " << currCostume << std::endl;
 	return UpdateDataMessage{ id, isAlive, pos.x, pos.y, spriteDir, spriteAction, currCostume };
 }
 

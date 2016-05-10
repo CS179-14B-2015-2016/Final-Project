@@ -402,9 +402,6 @@ void GameState::update(float dt) {
 				dataMtx.unlock();
 			}
 		}
-		else
-		{
-		}
 	}
 	else if(isFinished) {
 		sm->push(5, compressedMap);
