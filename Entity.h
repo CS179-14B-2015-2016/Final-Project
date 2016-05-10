@@ -52,7 +52,7 @@ public:
 	void handleInput(const UpdateInputMessage& input);
 	void update(float delta);
 	void update(const UpdateDataMessage& e);
-	void draw(sf::RenderWindow& window) const;
+	void draw(sf::RenderWindow& window, bool centered=false) const;
 	UpdateDataMessage getData() const;
 	sf::Vector2i getPosition() const;
 	void die();

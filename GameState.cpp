@@ -410,10 +410,19 @@ void GameState::update(float dt) {
 
 void GameState::draw(sf::RenderWindow& window) const {
 	if (inGame) {
+		sf::View minimap(sf::FloatRect(0,0, window.getSize().x, window.getSize().y));
+		minimap.setViewport(sf::FloatRect(0.75f, 0, 0.25f, 0.25f));
 		map->drawTiles(&window);
 
 		for (auto entity : *entities)
-			entity->draw(window);
+			if (entity != character)
+				entity->draw(window);
+
+		window.setView(minimap);
+		map->drawTiles(&window);
+		character->draw(window, false);
+		window.setView(window.getDefaultView());
+		character->draw(window, true);
 	}
 }
 

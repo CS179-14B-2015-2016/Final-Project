@@ -129,6 +129,8 @@ void ClientConnection::interpretData() {
 			for (auto i = 0; i < gamestate->totalClients * 3; i++)
 				(*gamestate->entities)[i] = std::make_shared<Entity>(0, 0, gamestate, false, i);
 
+			gamestate->character = (*gamestate->entities)[id];
+
 			std::string toSend = "";
 			auto mh = MessageHeader{ MessageType::READY, toSend.length() + 1 };
 			std::vector<uint8_t> sendBuffer;

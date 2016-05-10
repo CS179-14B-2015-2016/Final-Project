@@ -257,12 +257,12 @@ UpdateDataMessage Entity::getData() const {
 	return UpdateDataMessage{ id, isAlive, pos.x, pos.y, spriteDir, spriteAction, currCostume };
 }
 
-void Entity::draw(sf::RenderWindow& window) const {
+void Entity::draw(sf::RenderWindow& window, bool centered) const {
 	if (isAlive)
 	{
 		sf::Sprite toDraw(*sheet, sf::IntRect(spriteAction * 32, spriteDir * 32, 32, 32));
 
-		if (this->id == gamestate->yourID)
+		if (centered)
 		{
 			sf::View player_view(sf::FloatRect(0, 0, window.getSize().x/2.0, window.getSize().y/2.0));
 			toDraw.setPosition(pos.y, pos.x);
