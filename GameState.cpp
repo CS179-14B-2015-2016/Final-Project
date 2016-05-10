@@ -34,7 +34,7 @@ void GameState::serverLoop(bool generateMap, size_t player, std::string username
 	socket = new ip::tcp::socket(service);
 	sessions = new std::vector<std::shared_ptr<ServerSession>>();
 	entities = new std::vector<std::shared_ptr<Entity>>();
-	entities->resize(player*3);
+	entities->resize( Universal::ENTITY_COUNT );
 	
 	{
 		auto position = findFreePosition();
@@ -43,7 +43,7 @@ void GameState::serverLoop(bool generateMap, size_t player, std::string username
 		(*entities)[0] = character;
 	}
 
-	for (auto i = player; i < player * 3; i++)
+	for (auto i = player; i < Universal::ENTITY_COUNT; i++)
 	{
 		auto position = findFreePosition();
 		reserveMap(position.x, position.y);
@@ -60,17 +60,14 @@ void GameState::serverLoop(bool generateMap, size_t player, std::string username
 	accept();
 
 	service.run();
-	std::cout << "Finished server thread" << std::endl;
 }
 
 void GameState::accept() {
 	if (vacantPlayers == 0)
 		return;
 	
-	std::cout << "Waiting for " << vacantPlayers << " more player/s" << std::endl;
 	acceptor->async_accept(*socket, [&](boost::system::error_code ec) {
 		sessions->push_back(std::make_shared<ServerSession>(std::move(*socket), sessions->size(), this));
-		std::cout << "Someone went in!" << std::endl;
 		vacantPlayers--;
 		accept();
 	});
@@ -111,7 +108,6 @@ std::string GameState::checkName(const std::string& desired) {
 }
 
 void GameState::registerName(std::string username) {
-	std::cout << username << " is being registered" << std::endl;
 	(*nameList).insert(username);
 }
 
@@ -119,7 +115,6 @@ void GameState::clientLoop(std::string IP, std::string username) {
 	client = new ClientConnection(service, this);
 	client->connect(IP, username);
 	service.run();
-	std::cout << "Finished client thread" << std::endl;
 }
 
 void GameState::onActivate(const std::string& activate) {
@@ -362,12 +357,8 @@ void GameState::update(float dt) {
 	{
 		if (isHost)
 		{
-			static float timeRemaining = Universal::GAME_DURATION;
-			timeRemaining -= dt;
-			std::cout << timeRemaining << std::endl;
-			if (timeRemaining <= 0)
+			if (hud.update(dt))
 			{
-
 				inGame = false;
 				isFinished = true;
 
@@ -383,8 +374,6 @@ void GameState::update(float dt) {
 					if (session != nullptr)
 						session->activate(false);
 				}
-
-				std::cout << "Broadcasted GAME FINISH to everyone" << std::endl;
 			}
 			else
 			{
@@ -422,6 +411,7 @@ void GameState::draw(sf::RenderWindow& window) const {
 		map->drawTiles(&window);
 		character->draw(window, false);
 		window.setView(window.getDefaultView());
+		hud.draw(window);
 		character->draw(window, true);
 	}
 }

@@ -16,8 +16,6 @@ void ClientConnection::connect(std::string host, std::string username) {
 	this->username = username;
 	auto endpoint_iterator = resolver.resolve({this->host, std::to_string(GameState::tcpPort)});
 	async_connect(socket, endpoint_iterator, [&](boost::system::error_code ec, ip::tcp::resolver::iterator it) {
-		std::cout << "Managed to connect to " << this->host << std::endl;
-		
 		auto mh = MessageHeader{ MessageType::CONNECT, this->username.length()+1 };
 		std::vector<uint8_t> sendBuffer;
 		sendBuffer.resize( sizeof(MessageHeader) + mh.size );
@@ -92,8 +90,6 @@ void ClientConnection::interpretData() {
 			if (username.length() > 0)
 				username = username.substr(0, username.length() - 1);
 
-			std::cout << "Confirmed to be: " << username << " with id of " << (int)id << std::endl;
-
 			std::string toSend = "";
 			auto mh = MessageHeader{ MessageType::MAP_REQUEST, toSend.length() + 1 };
 			std::vector<uint8_t> sendBuffer;
@@ -109,9 +105,6 @@ void ClientConnection::interpretData() {
 			auto linearized = std::string(reinterpret_cast<char*>(recBuffer.data() + sizeof(MapMessage)));
 			gamestate->totalClients = recdata->clients;
 
-			std::cout << "Got a " << recdata->height << " x " << recdata->width << " map!" << std::endl;
-			std::cout << "Length of string: " << linearized.length() << std::endl;
-
 			gamestate->mapData = new uint8_t*[ recdata->height ];
 			for (auto i = 0; i < recdata->height; i++)
 			{
@@ -125,8 +118,8 @@ void ClientConnection::interpretData() {
 			gamestate->compressMap();
 
 			gamestate->entities = new std::vector<std::shared_ptr<Entity>>();
-			gamestate->entities->resize(gamestate->totalClients*3);
-			for (auto i = 0; i < gamestate->totalClients * 3; i++)
+			gamestate->entities->resize( Universal::ENTITY_COUNT );
+			for (auto i = 0; i < Universal::ENTITY_COUNT; i++)
 				(*gamestate->entities)[i] = std::make_shared<Entity>(0, 0, gamestate, false, i);
 
 			gamestate->character = (*gamestate->entities)[id];
@@ -144,8 +137,6 @@ void ClientConnection::interpretData() {
 		case MessageType::GAME_START: {
 			gamestate->inGame = true;
 
-			std::cout << "Game has started!" << std::endl;
-
 			break;
 		}
 		case MessageType::UPDATE_DATA: {
@@ -162,8 +153,6 @@ void ClientConnection::interpretData() {
 			isActive = false;
 			gamestate->inGame = false;
 			gamestate->isFinished = true;
-
-			std::cout << "Game has finished!" << std::endl;
 
 			std::string toSend = "";
 			auto mh = MessageHeader{ MessageType::DISCONNECT, toSend.length() + 1 };

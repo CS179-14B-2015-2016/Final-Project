@@ -131,6 +131,8 @@ void Entity::update(float delta)
 				else if (randomValue==2)	moveLeft = true;
 				else if (randomValue==3)	moveRight = true;
 				else						timeLeft = 0.6;
+
+				gamestate->reserveMap(curr.x, curr.y);
 			}
 		}
 		
@@ -141,11 +143,15 @@ void Entity::update(float delta)
 			{
 				score++;
 				gamestate->takeJewel(nextX, nextY);
+				if (this->id == gamestate->yourID)
+				{
+					gamestate->hud.setJewelCount(score);
+				}
 			}
 			else if (objectCode == 8)
 			{
 				auto object = gamestate->getEntityAt(nextX, nextY);
-				if (object != nullptr && object->spriteDir==this->spriteDir)
+				if (object != nullptr)
 				{
 					if (object->isPlayer)
 					{
@@ -252,8 +258,6 @@ void Entity::update(const UpdateDataMessage& data)
 }
 
 UpdateDataMessage Entity::getData() const {
-	if (id == 2)
-		std::cout << "Telling the future I am wearing the costume " << currCostume << std::endl;
 	return UpdateDataMessage{ id, isAlive, pos.x, pos.y, spriteDir, spriteAction, currCostume };
 }
 
@@ -281,6 +285,7 @@ void Entity::draw(sf::RenderWindow& window, bool centered) const {
 void Entity::die() {
 	isAlive = false;
 	gamestate->freeMap(curr.x, curr.y);
+	gamestate->hud.setJewelCount(0);
 }
 
 sf::Vector2i Entity::getPosition() const

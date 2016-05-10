@@ -13,7 +13,6 @@ host(Button(sf::Vector2f(Universal::window_width/2.0, Universal::window_height/2
 options(Button(sf::Vector2f(Universal::window_width/2.0, Universal::window_height/2.0 + 150), sf::Vector2f(100, 20), "Options")),
 exit(Button(sf::Vector2f(Universal::window_width/2.0, Universal::window_height/2.0 + 200), sf::Vector2f(100, 20), "Exit"))
 {
-    std::cout<< "MENU STATE" <<std::endl;
     cover = 255;
 }
 

@@ -10,7 +10,8 @@ struct Universal {
 	static constexpr int window_height = 800;
 	static constexpr float fps = 30.0;
 	static constexpr float spf = 1.0 / fps;
-	static constexpr float GAME_DURATION = 60.0f;
+	static constexpr float GAME_DURATION = 90.0f;
+	static constexpr int ENTITY_COUNT = 15;
 
 	static sf::Font getFont() {
 		static sf::Font font;

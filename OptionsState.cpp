@@ -327,7 +327,6 @@ void OptionsState::onActivate()
 
 void OptionsState::onDeactivate()
 {
-    std::cout<<" HJSHKAJSHDJKASHDKJASD" <<std::endl;
     state = 0;
 
     std::ofstream configfile;
