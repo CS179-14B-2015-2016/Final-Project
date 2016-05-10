@@ -355,9 +355,10 @@ void GameState::handleInput(int u, int v, const std::string& typed, sf::Event e)
 void GameState::update(float dt) {
 	if (inGame) 
 	{
+		hud.update(dt);
 		if (isHost)
 		{
-			if (hud.update(dt))
+			if (hud.update(0))
 			{
 				inGame = false;
 				isFinished = true;
