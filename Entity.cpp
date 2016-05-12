@@ -293,6 +293,8 @@ void Entity::draw(sf::RenderWindow& window, bool centered) const {
 void Entity::die() {
 	isAlive = false;
 	gamestate->freeMap(curr.x, curr.y);
+	if (isMoving)
+		gamestate->freeMap(next.x, next.y);
 }
 
 sf::Vector2i Entity::getPosition() const
