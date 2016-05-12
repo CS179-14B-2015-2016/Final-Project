@@ -34,6 +34,7 @@ struct UpdateDataMessage {
 	int spriteDir;
 	int spriteAction;
 	int currCostume;
+	int score;
 };
 
 struct UpdateInputMessage {

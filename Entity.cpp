@@ -163,6 +163,10 @@ void Entity::update(float delta)
 						this->score = 0;
 						this->die();
 					}
+
+					if(gamestate->yourID == id)
+						gamestate->hud.setJewelCount(score);
+
 					object->die();
 				}
 			}
@@ -253,12 +257,16 @@ void Entity::update(const UpdateDataMessage& data)
 	this->spriteDir = data.spriteDir;
 	this->spriteAction = data.spriteAction;
 	this->currCostume = data.currCostume;
+	this->score = data.score;
 
+	if(gamestate->yourID == id) {
+		gamestate->hud.setJewelCount(score);
+	}
 	sheet = SpriteSheetLoader::getInstance()->getSpriteSheet(filepaths[currCostume]);
 }
 
 UpdateDataMessage Entity::getData() const {
-	return UpdateDataMessage{ id, isAlive, pos.x, pos.y, spriteDir, spriteAction, currCostume };
+	return UpdateDataMessage{ id, isAlive, pos.x, pos.y, spriteDir, spriteAction, currCostume, score };
 }
 
 void Entity::draw(sf::RenderWindow& window, bool centered) const {
@@ -285,7 +293,6 @@ void Entity::draw(sf::RenderWindow& window, bool centered) const {
 void Entity::die() {
 	isAlive = false;
 	gamestate->freeMap(curr.x, curr.y);
-	gamestate->hud.setJewelCount(0);
 }
 
 sf::Vector2i Entity::getPosition() const
